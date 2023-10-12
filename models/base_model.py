@@ -15,14 +15,20 @@ class BaseModel():
     Methods:
     __init__()
     """
-    prompt = "(hbnb) "
 
-    def __init__(self, my_number=0, name=""):
+    available = 0
+    def __init__(self, *args, **kwargs):
         self.id = str(uuid.uuid4())
-        self.my_number = my_number
-        self.name = name
-        self.created_at = datetime.utcnow()
-        self.updated_at = datetime.utcnow()
+        if args:
+            self.my_number = args
+            self.name = args
+        if kwargs:
+            self.created_at = datetime.utcnow()
+            self.updated_at = datetime.utcnow()
+            available = 1
+        else:
+            self.created_at = str(datetime.utcnow())
+            self.updated_at = str(datetime.utcnow())
 
     def __str__(self):
         """ This is the string magic method
@@ -37,19 +43,6 @@ class BaseModel():
         """
         self.updated_at = datetime.utcnow()
 
-    def do_EOF(self, line):
-        """ This is the EOF method
-        It enables smooth exiting upon hitting
-        CTRL+d
-        """
-        return True
-
-    def postloop(self):
-        """The postloop method
-        Can be used as a stub
-        """
-        print()
-
     def to_dict(self):
         """to_dict method
         This method returns a dictionary representation
@@ -60,6 +53,7 @@ class BaseModel():
         self.__dict__.pop('completekey', None)
         self.__dict__.pop('stdout', None)
         my_dict = self.__dict__
-        my_dict["__class__"] = self.__class__.__name__
+        if not self.available:
+            my_dict["__class__"] = self.__class__.__name__
 
         return my_dict
