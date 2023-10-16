@@ -54,23 +54,27 @@ class HBNBCommand(cmd.Cmd):
         """
         return
 
-    def do_create(self, model):
+    def do_create(self, args):
         """ The create method
         It creates a new instance of BaseModel
         """
+        my_args = args.split()
         try:
-            if not model:
-                raise TypeError('** class name missing **')
-            if not hasattr(model, '__name__'):
-                print("** class doesn't exist **")
-            else:
+            if len(my_args) != 1:
+                raise TypeError()
+            if eval(my_args[0]):
                 instance = BaseModel()
+                instance.save()
                 print(instance.id)
-                with open("./file.json", 'w') as f:
-                    my_string = json.dumps(instance.to_dict)
-                    f.write(my_string)
-        except TypeError as e:
-            print(e)
+        except TypeError:
+            if len(my_args) == 0:
+                print('** class name missing **')
+            else:
+                pass
+            return
+        except NameError:
+            print("** class doesn't exist **")
+            return
 
     def help_create(self):
         """ Helper for create
@@ -90,11 +94,12 @@ class HBNBCommand(cmd.Cmd):
             model, mod_id = my_args
             with open("./file.json") as f:
                 my_dict = json.load(f)
-                for obj in my_dict:
-                    if obj['id'] == mod_id:
-                        print(obj)
-                        return
-                print("** no instance found **")
+            for key, value in my_dict.items():
+                if mod_id in key:
+                    my_inst = BaseModel(**my_dict[key])
+                    print(my_inst)
+                    return
+            print("** no instance found **")
         except TypeError:
             if len(my_args) == 0:
                 print("** class name missing **")
@@ -106,6 +111,12 @@ class HBNBCommand(cmd.Cmd):
                     print("** class doesn't exist **")
                     return
                 print("** instance id missing **")
+            else:
+                pass
+        except json.JSONDecodeError:
+            return
+        except FileNotFoundError:
+            print("** no instance found **")
 
     def help_show(self):
         """ Helper for show
@@ -123,13 +134,16 @@ class HBNBCommand(cmd.Cmd):
             if len(my_args) != 2:
                 raise TypeError()
             model, mod_id = my_args
-            with open("./file.json", 'w') as f:
-                my_dict = json.load(f)
-            for obj in my_dict:
-                if obj['id'] == mod_id:
-                    del obj
-                    return
-            print("** no instance found **")
+            try:
+                with open("./file.json", 'w') as f:
+                    my_dict = json.load(f)
+                for key, value in my_dict.items():
+                    if mod_id in key:
+                        del my_dict[key]
+                        return
+                print("** no instance found **")
+            except json.JSONDecodeError:
+                pass
         except TypeError:
             if len(my_args) == 0:
                 print("** class name missing **")
@@ -149,27 +163,40 @@ class HBNBCommand(cmd.Cmd):
         print("Delete instance using class name and id")
         print()
 
-    def do_all(self, model):
+    def do_all(self, args):
         """ The all method
         Prints all string rep of all instances based/not on the class name
         """
+        my_args = args.split()
         try:
-            if not model:
-                raise TypeError('** class name missing **')
-            if hasattr(model, '__name__'):
-                with open("./file.json", 'w') as f:
-                    my_dict = json.load(f)
-                for obj in my_dict:
-                    if model in obj:
-                        print(obj)
-                        break
-            else:
+            if len(my_args) != 1:
+                raise TypeError()
+            model = my_args[0]
+            try:
+                if eval(model):
+                    with open('file.json', 'r') as f:
+                        my_dict = json.load(f)
+                    for key, value in my_dict.items():
+                        if model in key:
+                            my_inst = BaseModel(**my_dict[key])
+                            print(str(my_inst))
+            except NameError:
                 print("** class doesn't exist **")
                 return
         except TypeError:
-            with open("./file.json", 'w') as f:
-                my_dict = json.load(f)
-                print(my_dict)
+            if len(my_args) == 0:
+                try:
+                    with open('file.json', 'r') as f:
+                        my_dict = json.load(f)
+                        my_inst = BaseModel(**my_dict)
+                        print(str(my_inst))
+                except json.JSONDecodeError:
+                    pass
+            else:
+                pass
+            return
+        except json.JSONDecodeError:
+            pass
 
     def help_all(self):
         """ Helper for all
@@ -178,41 +205,32 @@ class HBNBCommand(cmd.Cmd):
         print("Print all instances as strings")
         print()
 
-    def do_update(self, model, mod_id, attrib, attrib_value):
+    def do_update(self):
         """ The update method
         Updates instance based on class name & id by adding/updating attribute
         """
+        my_args = args.split()
         try:
-            if hasattr(model, '__name__'):
-                pass
-            else:
+            if len(my_args) != 4:
+                raise TypeError()
+            model, mod_id, attrib, attrib_value = my_args
+            try:
+                if eval(my_args[0]):
+                    pass
+            except NameError:
                 print("** class doesn't exist **")
                 return
         except TypeError:
-            print("** class name missing **")
-            return
-        try:
-            with open("./file.json", 'w') as f:
-                my_dict = json.load(f)
-            for obj in my_dict:
-                if obj['id'] == mod_id:
-                    del obj
-                    break
-                else:
-                    print("** no instance found **")
-                    return
-        except TypeError:
-            print("** instance id missing **")
-            return
-        try:
-            pass
-        except TypeError:
-            print("** attribute name missing **")
-            return
-        try:
-            pass
-        except TypeError:
-            print("** value missing **")
+            if len(my_args) == 0:
+                print("** class name missing **")
+            elif len(my_args) == 1:
+                print("** instance id missing **")
+            elif len(my_args) == 2:
+                print("** attribute name missing **")
+            elif len(my_args) == 3:
+                print("** value missing **")
+            else:
+                pass
             return
 
     def help_update(self):
