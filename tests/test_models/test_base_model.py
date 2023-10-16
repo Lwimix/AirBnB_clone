@@ -46,17 +46,49 @@ class TestBaseModelClass(unittest.TestCase):
 
     def test_to_dict(self):
         """Testing BaseModel's to_dict method."""
-        dict_1 = self.case_1.to_dict()
-        self.assertIsInstance(dict_1["__class__"], str)
-        self.assertEqual(dict_1["__class__"], "BaseModel")
-        self.assertIsInstance(dict_1["updated_at"], str)
-        self.assertIsInstance(dict_1["created_at"], str)
+        to_dict_1 = self.case_1.to_dict()
+        self.assertIsInstance(to_dict_1["__class__"], str)
+        self.assertEqual(to_dict_1["__class__"], "BaseModel")
+        self.assertIsInstance(to_dict_1["updated_at"], str)
+        self.assertIsInstance(to_dict_1["created_at"], str)
 
-        dict_2 = self.case_2.to_dict()
-        self.assertIsInstance(dict_2["__class__"], str)
-        self.assertEqual(dict_2["__class__"], "BaseModel")
-        self.assertIsInstance(dict_2["updated_at"], str)
-        self.assertIsInstance(dict_2["created_at"], str)
+        to_dict_2 = self.case_2.to_dict()
+        self.assertIsInstance(to_dict_2["__class__"], str)
+        self.assertEqual(to_dict_2["__class__"], "BaseModel")
+        self.assertIsInstance(to_dict_2["updated_at"], str)
+        self.assertIsInstance(to_dict_2["created_at"], str)
+
+    def test_k_args(self):
+        """Testing initialized attributes when **kwargs are provided."""
+        self.case_4 = BaseModel()
+        to_dict_4 = self.case_4.to_dict()
+        self.case_5 = BaseModel(**to_dict_4)
+        dict_5 = self.case_5.__dict__
+        dict_3 = self.case_3.__dict__
+        keys_5 = list(dict_5)
+        keys_3 = list(self.case_3.__dict__)
+
+        # Checking on the available attributes (input: kwargs).
+        self.assertNotIn("__class__", keys_5)
+        self.assertIn("created_at", keys_5)
+        self.assertIn("updated_at", keys_5)
+        self.assertIn("id", keys_5)
+
+        # Checking on the object type of each attribute (input: kwargs).
+        self.assertIsInstance(dict_5["created_at"], datetime)
+        self.assertIsInstance(dict_5["updated_at"], datetime)
+        self.assertIsInstance(dict_5["id"], str)
+
+        # Checking on the available attributes (input: None).
+        self.assertNotIn("__class__", keys_3)
+        self.assertIn("created_at", keys_3)
+        self.assertIn("updated_at", keys_3)
+        self.assertIn("id", keys_3)
+
+        # Checking on the object type of each attribute (input: None).
+        self.assertIsInstance(dict_3["created_at"], datetime)
+        self.assertIsInstance(dict_3["updated_at"], datetime)
+        self.assertIsInstance(dict_3["id"], str)
 
 
 if __name__ == "__main__":
