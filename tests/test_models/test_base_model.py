@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""test_base_model module for unit testing BaseModel Class""" 
+"""test_base_model module for unit testing BaseModel Class"""
 import unittest
 from datetime import datetime
 from models.base_model import BaseModel
@@ -57,6 +57,7 @@ class TestBaseModelClass(unittest.TestCase):
         self.assertEqual(dict_2["__class__"], "BaseModel")
         self.assertIsInstance(dict_2["updated_at"], str)
         self.assertIsInstance(dict_2["created_at"], str)
+
 
 if __name__ == "__main__":
     unittest.main()
